@@ -271,11 +271,10 @@ public class mainFrame extends javax.swing.JFrame {
         String value=tableResults.getModel().getValueAt(row,e.getColumn()).toString();
         
         try {
-            PreparedStatement update=con.prepareStatement("update city set "+columnName+"=? where ?=?");
+            PreparedStatement update=con.prepareStatement("update city set "+columnName+"=? where "+primary_key+"=?");
 
             update.setString(1, value);
-            update.setString(2, primary_key);
-            update.setInt(3, id);
+            update.setInt(2, id);
             System.out.println(update.toString());
             update.executeUpdate();
         } catch (SQLException ex) {
