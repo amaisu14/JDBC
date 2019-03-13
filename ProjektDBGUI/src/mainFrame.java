@@ -60,8 +60,14 @@ public class mainFrame extends javax.swing.JFrame {
         btnDisconnect = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableResults = new javax.swing.JTable();
+        lblTable = new javax.swing.JLabel();
+        lblPassword = new javax.swing.JLabel();
+        txtUser = new javax.swing.JTextField();
+        lblUser = new javax.swing.JLabel();
         txtDatabase = new javax.swing.JTextField();
         lblDatabase = new javax.swing.JLabel();
+        cmbboxTable = new javax.swing.JComboBox();
+        pass = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -111,6 +117,19 @@ public class mainFrame extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tableResults);
 
+        lblTable.setText("Table:");
+
+        lblPassword.setText("Password:");
+
+        txtUser.setText("root");
+        txtUser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtUserActionPerformed(evt);
+            }
+        });
+
+        lblUser.setText("User:");
+
         txtDatabase.setText("world");
         txtDatabase.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -120,46 +139,61 @@ public class mainFrame extends javax.swing.JFrame {
 
         lblDatabase.setText("Database:");
 
+        cmbboxTable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbboxTableActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 702, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblServer, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(txtServer, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
                                         .addComponent(lblPort, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblServer, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(txtServer, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(105, 105, 105))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblTable, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmbboxTable, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(btnConnect, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnDisconnect, javax.swing.GroupLayout.Alignment.TRAILING))))
-                        .addGap(22, 22, 22))))
+                                    .addComponent(txtUser, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(pass, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(97, 97, 97)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btnConnect, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnDisconnect))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addGap(20, 20, 20))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addComponent(btnConnect)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnDisconnect))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -169,13 +203,26 @@ public class mainFrame extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblPort, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(41, 41, 41)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblTable, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbboxTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnConnect, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(33, 33, 33)
+                            .addComponent(lblPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnDisconnect, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(102, Short.MAX_VALUE))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         pack();
@@ -192,49 +239,13 @@ public class mainFrame extends javax.swing.JFrame {
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
         try {
             // TODO add your handling code here:
-            con = DriverManager.getConnection("jdbc:mysql://"+txtServer.getText()+"/"+txtDatabase.getText(), "root", "");
+            con = DriverManager.getConnection("jdbc:mysql://"+txtServer.getText()+":"+txtPort.getText()+"/"+txtDatabase.getText(), txtUser.getText(), pass.getText());
             System.out.println("Connected with Datenbank");
             btnConnect.setEnabled(false);
             txtServer.setEnabled(false);
             btnDisconnect.setEnabled(true);
+            fillComboBox();
             
-            dmd=con.getMetaData();
-            ResultSet rs =dmd.getColumns(null, null, "city", null);
-            ResultSet primaryKey=dmd.getPrimaryKeys(null, null, "city");
-            primaryKey.next();
-            primPos=primaryKey.getInt("KEY_SEQ");
-            primary_key=primaryKey.getString(4);
-            System.out.println(primPos);
-            OurTableModel tableModel=new OurTableModel(primPos-1);
-            int num_cols=0;
-            while(rs.next()){
-                tableModel.addColumn(rs.getString(4));
-                System.out.println(rs.getString(4));
-                num_cols++;
-            }
-            tableResults.setModel(tableModel);
-            
-            Statement stm=con.createStatement();
-            rs=stm.executeQuery("select * from city");
-            while(rs.next()){
-                Object[] arr= new Object[num_cols];
-                for(int i=0;i<num_cols;i++){
-                    arr[i]=rs.getObject(i+1);
-                }
-                tableModel.addRow(arr);
-            }
-            
-            tableModel.addRow(new Object[num_cols]);
-            tableResults.setModel(tableModel);
-           
-            tableModel.addTableModelListener(new TableModelListener(){
-
-                @Override
-                public void tableChanged(TableModelEvent e) {
-                    tblChanged(e);
-                }
-                
-            });
                 
         } catch (SQLException ex) {
             Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -248,11 +259,14 @@ public class mainFrame extends javax.swing.JFrame {
     private void btnDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDisconnectActionPerformed
         try {
             // TODO add your handling code here:
+            cmbboxTable.removeAllItems();
             con.close();
             btnConnect.setEnabled(true);
             txtServer.setEnabled(true);
             btnDisconnect.setEnabled(false);
+            
             System.out.println("Connection closed");
+           
         } catch (SQLException ex) {
             Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Disconnect failed");
@@ -260,9 +274,72 @@ public class mainFrame extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btnDisconnectActionPerformed
 
+    private void txtUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUserActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUserActionPerformed
+
     private void txtDatabaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDatabaseActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDatabaseActionPerformed
+
+    private void cmbboxTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbboxTableActionPerformed
+        if(cmbboxTable.getSelectedItem()!=null){
+            try {
+                cmbBoxIndex=cmbboxTable.getSelectedIndex();
+                dmd=con.getMetaData();
+                ResultSet rs =dmd.getColumns(null, null, cmbboxTable.getItemAt(cmbBoxIndex).toString(), null);
+                ResultSet primaryKey=dmd.getPrimaryKeys(null, null, "city");
+                primaryKey.next();
+                primPos=primaryKey.getInt("KEY_SEQ");
+                primary_key=primaryKey.getString(4);
+                System.out.println(primPos);
+                OurTableModel tableModel=new OurTableModel(primPos-1);
+                int num_cols=0;
+                while(rs.next()){
+                    tableModel.addColumn(rs.getString(4));
+                    System.out.println(rs.getString(4));
+                    num_cols++;
+                }
+                tableResults.setModel(tableModel);
+
+                Statement stm=con.createStatement();
+                rs=stm.executeQuery("select * from "+cmbboxTable.getItemAt(cmbBoxIndex));
+                while(rs.next()){
+                    Object[] arr= new Object[num_cols];
+                    for(int i=0;i<num_cols;i++){
+                        arr[i]=rs.getObject(i+1);
+                    }
+                    tableModel.addRow(arr);
+                }
+
+                tableModel.addRow(new Object[num_cols]);
+                tableResults.setModel(tableModel);
+
+                tableModel.addTableModelListener(new TableModelListener(){
+
+                    @Override
+                    public void tableChanged(TableModelEvent e) {
+                        tblChanged(e);
+                    }
+
+                });
+            } catch (SQLException ex) {
+                Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_cmbboxTableActionPerformed
+    private void fillComboBox(){
+        try {
+            dmd=con.getMetaData();
+            ResultSet r=dmd.getTables(null, null,null,null);
+            while(r.next()){
+                cmbboxTable.addItem(r.getString(3));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     private void tblChanged(TableModelEvent e){
         int row=e.getFirstRow();
         String columnName=tableResults.getModel().getColumnName(e.getColumn());
@@ -319,17 +396,24 @@ public class mainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConnect;
     private javax.swing.JButton btnDisconnect;
+    private javax.swing.JComboBox cmbboxTable;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblDatabase;
+    private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblPort;
     private javax.swing.JLabel lblServer;
+    private javax.swing.JLabel lblTable;
+    private javax.swing.JLabel lblUser;
+    private javax.swing.JPasswordField pass;
     private javax.swing.JTable tableResults;
     private javax.swing.JTextField txtDatabase;
     private javax.swing.JTextField txtPort;
     private javax.swing.JTextField txtServer;
+    private javax.swing.JTextField txtUser;
     // End of variables declaration//GEN-END:variables
     Connection con=null;
     DatabaseMetaData dmd=null;
     int primPos;
     String primary_key;
+    int cmbBoxIndex=0;
 }
