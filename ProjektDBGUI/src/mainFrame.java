@@ -418,7 +418,7 @@ public class mainFrame extends javax.swing.JFrame {
         int row=e.getFirstRow();
         String columnName=tableResults.getModel().getColumnName(e.getColumn());
         if(row!=tableResults.getModel().getRowCount()-1){
-            int id=Integer.parseInt(tableResults.getModel().getValueAt(row, primPos-1).toString());
+            String id=tableResults.getModel().getValueAt(row, primPos-1).toString();
             System.out.println(columnName+row+id);
             String value=tableResults.getModel().getValueAt(row,e.getColumn()).toString();
 
@@ -426,7 +426,7 @@ public class mainFrame extends javax.swing.JFrame {
                 PreparedStatement update=con.prepareStatement("update city set "+columnName+"=? where "+primary_key+"=?");
 
                 update.setString(1, value);
-                update.setInt(2, id);
+                update.setString(2, ""+id);
                 System.out.println(update.toString());
                 update.executeUpdate();
                 
