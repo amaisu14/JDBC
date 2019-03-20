@@ -70,6 +70,7 @@ public class mainFrame extends javax.swing.JFrame {
         cmbboxTable = new javax.swing.JComboBox();
         pass = new javax.swing.JPasswordField();
         btnDelete = new javax.swing.JButton();
+        btnInsert = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -154,6 +155,13 @@ public class mainFrame extends javax.swing.JFrame {
             }
         });
 
+        btnInsert.setText("Insert");
+        btnInsert.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInsertActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -184,10 +192,6 @@ public class mainFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(cmbboxTable, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(89, 89, 89)
-                                .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -198,7 +202,13 @@ public class mainFrame extends javax.swing.JFrame {
                                 .addGap(97, 97, 97)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(btnConnect, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnDisconnect))))
+                                    .addComponent(btnDisconnect)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(cmbboxTable, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(89, 89, 89)
+                                .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnInsert, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(20, 20, 20))
         );
@@ -221,7 +231,8 @@ public class mainFrame extends javax.swing.JFrame {
                             .addComponent(lblDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblTable, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(cmbboxTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnDelete)))
+                            .addComponent(btnDelete)
+                            .addComponent(btnInsert)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -359,6 +370,38 @@ public class mainFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnInsertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertActionPerformed
+        try { 
+            int num_cols=0;
+            int lastRow=tableResults.getModel().getRowCount()-1;
+            ResultSet rs =dmd.getColumns(null, null, cmbboxTable.getItemAt(cmbBoxIndex).toString(), null);
+            String sql="INSERT INTO "+cmbboxTable.getItemAt(cmbBoxIndex)+"(";
+            rs.next();
+            while(rs.next()){
+                sql+=rs.getString(4)+",";
+                num_cols++;
+            }
+            sql = sql.substring(0, sql.length() - 1);
+            sql+=") VALUES (";
+         
+            for(int i=0;i<num_cols;i++){
+                sql+="?,";
+//                sql+=tableResults.getModel().getValueAt(lastRow, i+1)+",";
+            }
+            sql = sql.substring(0, sql.length() - 1);
+            sql+=");";
+            System.out.println(sql);
+            PreparedStatement prepInsert=con.prepareStatement(sql);
+            for(int i=0;i<num_cols;i++){
+                prepInsert.setString(i+1, ""+tableResults.getModel().getValueAt(lastRow, i+1));
+            }
+            
+            prepInsert.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnInsertActionPerformed
     private void fillComboBox(){
         try {
             dmd=con.getMetaData();
@@ -433,6 +476,7 @@ public class mainFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnConnect;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnDisconnect;
+    private javax.swing.JButton btnInsert;
     private javax.swing.JComboBox cmbboxTable;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblDatabase;
