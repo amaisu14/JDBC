@@ -20,7 +20,7 @@ public class OurTableModel extends DefaultTableModel{
     }
     @Override
     public boolean isCellEditable(int row,int column){
-        if(column==columnDisabled) 
+        if(column==columnDisabled && row!=getRowCount()-1) 
             return false;
         else 
             return true;

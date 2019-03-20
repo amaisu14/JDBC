@@ -1,4 +1,4 @@
-
+//Benötigte Imports
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -8,18 +8,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JButton;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableModel;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *
@@ -32,8 +25,13 @@ public class mainFrame extends javax.swing.JFrame {
      * Creates new form mainFrame
      */
     public mainFrame() {
+        //JFrame Komponente initialisieren
         initComponents();
         
+        /* 
+        JDBC Treiber laden. Erstellt eine Error-Message Dialog 
+        und beendet das Programm wenn es kein Treiber gefunden wird
+        */
         try {
             Class.forName("com.mysql.jdbc.Driver");
             System.out.println("Driver succesfully loaded");
@@ -261,17 +259,25 @@ public class mainFrame extends javax.swing.JFrame {
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
         try {
-            // TODO add your handling code here:
+            /*
+            Connection erstellen: Benötigte Informationen von
+            den zugehörigen TextFields kreigen.
+            Erstellt eine Error-Message Dialog und beendet das Programm 
+            wenn es ein Fehler eintritt
+            */
             con = DriverManager.getConnection("jdbc:mysql://"+txtServer.getText()+":"+txtPort.getText()+"/"+txtDatabase.getText(), txtUser.getText(), pass.getText());
             System.out.println("Connected with Datenbank");
+            
+            //Wenn verbunden, einige Komponente gehören als nicht Verfügbar gesetzt werden
             btnConnect.setEnabled(false);
             txtServer.setEnabled(false);
             btnDisconnect.setEnabled(true);
+            
+            //Combo Box mit Tabellennamen füllen
             fillComboBox();
             
-                
+        //Exception fangen
         } catch (SQLException ex) {
-            Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Connection failed");
             javax.swing.JOptionPane.showMessageDialog(this , "Connection Failed","ERROR!", WIDTH);
             System.exit(1);
@@ -281,15 +287,18 @@ public class mainFrame extends javax.swing.JFrame {
 
     private void btnDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDisconnectActionPerformed
         try {
-            // TODO add your handling code here:
+            //Combo Box leeren
             cmbboxTable.removeAllItems();
+            
+            //Verbindung schließen und andere Komponente als nich Verfügbar setzen.
             con.close();
             btnConnect.setEnabled(true);
             txtServer.setEnabled(true);
             btnDisconnect.setEnabled(false);
             
             System.out.println("Connection closed");
-           
+          
+        //Exception fangen
         } catch (SQLException ex) {
             Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Disconnect failed");
@@ -305,131 +314,222 @@ public class mainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDatabaseActionPerformed
 
+    
+    /*Action Listener für Combo Box Eintritte*/
     private void cmbboxTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbboxTableActionPerformed
         if(cmbboxTable.getSelectedItem()!=null){
+            fillTable();
+        }
+    }//GEN-LAST:event_cmbboxTableActionPerformed
+
+    /*Action Listener für Delete Button*/
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        //Den zu löschende Zeilennummer speichern
+        int row=tableResults.getSelectedRow();
+        
+        //Wenn es nicht die letzte Zeile ist (sonst Insert)
+        if(row!=tableResults.getModel().getRowCount()-1){
+            //Wert des Primary Keys speichern (primPos-1 weil Spalten in getValueAt beginnen von 0)
+            int id=Integer.parseInt(tableResults.getModel().getValueAt(row, primPos-1).toString());
             try {
+                //Preparet statement erstellen
+                PreparedStatement delete=con.prepareStatement("delete from "+cmbboxTable.getItemAt(cmbBoxIndex)+ " where "+primary_key+"=?");
+                
+                //Parameter binden
+                delete.setInt(1, id);
+                delete.executeUpdate();
+            
+
+                
+                
+                //Tabele noch einmal Füllen, damit es mit dem DB synchronisiert ist
+                fillTable();
+                //tableModel.removeRow(row);  (andere Möglichkeit)
+
+            //Exception fangen
+            } catch (SQLException ex) {
+                System.err.println("Konnte nicht Zeile löschen!");
+            }
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    //Action Listener für Insert Button
+    private void btnInsertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertActionPerformed
+        try { 
+            //Anzahl der Spalten in der Tabelle
+            int num_cols=0;
+            //Letzte Zeile
+            int lastRow=tableResults.getModel().getRowCount()-1;
+            //Spaltennamen kreigen vom Meta-Data und die Tabelle, die im ComboBox selektiert ist
+            ResultSet rs =dmd.getColumns(null, null, cmbboxTable.getItemAt(cmbBoxIndex).toString(), null);
+            
+            /*SQL Statemet erstellen*/
+            String sql="INSERT INTO "+cmbboxTable.getItemAt(cmbBoxIndex)+"(";
+            
+            //Diese Schleife iteriert durch jeder Spalte: 
+            //      rs.getString(4) ist Spaltennamme,
+            //      num_cols wird auch als index für die Spalte im JTable verwendet  
+            while(rs.next()){
+                if(tableResults.getModel().getValueAt(lastRow, num_cols)!=null)
+                    sql+=rs.getString(4)+",";
+                num_cols++; 
+            }
+     
+            //Der String hat eine Komma zu viel: letzte Character löschen
+            sql = sql.substring(0, sql.length() - 1);
+            
+            //Nächste Block des Statements
+            sql+=") VALUES (";
+
+            //Das Selbe wie vorige Schleife, aber '?' werden im Statement addiert.
+            for(int i=0;i<num_cols;i++){
+                if(tableResults.getModel().getValueAt(lastRow, i)!=null)
+                    sql+="?,";
+            }
+            //Der String hat eine Komma zu viel: letzte Character löschen
+            sql = sql.substring(0, sql.length() - 1);
+            sql+=");";
+
+            //SQL-Statement ist Fertig: PreparedStatement erstellen
+            PreparedStatement prepInsert=con.prepareStatement(sql);
+            
+            int fragezeichen=1;
+            //Parameter binden
+            for(int i=0;i<num_cols;i++){
+               if(tableResults.getModel().getValueAt(lastRow, i)!=null){
+                    //Erste Parameter der Methode setString soll 1,2,3,4... sein
+                    /*Wenn der Primary Key in der Mitte ist kann der Variable 'i'
+                    nicht verwendet(1,2,4...), deshalb eine andere Variable 'fragezeichen'*/
+                    prepInsert.setString(fragezeichen, ""+tableResults.getModel().getValueAt(lastRow, i));
+                    fragezeichen++;
+                }
+            }
+            
+            prepInsert.executeUpdate();
+            
+            //Tabele noch einmal Füllen, damit es mit dem DB synchronisiert ist
+            fillTable();
+            
+        //Exception fangen
+        } catch (SQLException ex) {
+            System.err.println("Konnte nicht Zeile einfügen");
+        }
+    }//GEN-LAST:event_btnInsertActionPerformed
+    
+    /*
+    Füllt den Combo Box mit Tabellennammen
+    keine Rückgabewert
+    */
+    private void fillComboBox(){
+        try {
+            //Tabellennamen von MetaData kriegen
+            dmd=con.getMetaData();
+            ResultSet r=dmd.getTables(null, null,null,null);
+            while(r.next()){
+                //Eintritte addieren
+                cmbboxTable.addItem(r.getString(3));
+            }
+        } 
+        //Exception fangen
+        catch (SQLException ex) {
+            Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    /*
+    Füllt den JTable mit Daten von der Tabelle (SELECT)
+    Fügt auch eine leere Zeile am ende für die Insert Funktion
+    keine Rückgabewert
+    */
+    private void fillTable(){
+        try {
                 cmbBoxIndex=cmbboxTable.getSelectedIndex();
                 dmd=con.getMetaData();
+                
+                //Spaltennammen von MetaData kriegen
                 ResultSet rs =dmd.getColumns(null, null, cmbboxTable.getItemAt(cmbBoxIndex).toString(), null);
-                ResultSet primaryKey=dmd.getPrimaryKeys(null, null, "city");
+                //Primary Keys von MetaData kriegen
+                ResultSet primaryKey=dmd.getPrimaryKeys(null, null, cmbboxTable.getItemAt(cmbBoxIndex).toString());
+                
+                //Meistens gibt es nur eine
                 primaryKey.next();
-                primPos=primaryKey.getInt("KEY_SEQ");
-                primary_key=primaryKey.getString(4);
-                System.out.println(primPos);
+                primPos=primaryKey.getInt("KEY_SEQ"); //position speichern (welche Spalte)
+                primary_key=primaryKey.getString(4);  //wert speicern
+
+                //TableModel für den JTable erstellen(Spalte mit Primary Key nicht editierbar)
                 tableModel=new OurTableModel(primPos-1);
                 int num_cols=0;
+                //Spaltennammen im Model einfügen
                 while(rs.next()){
                     tableModel.addColumn(rs.getString(4));
-                    System.out.println(rs.getString(4));
                     num_cols++;
                 }
                
                 tableResults.setModel(tableModel);
 
+                //Daten mit einem SELECT Statement kriegen
                 Statement stm=con.createStatement();
                 rs=stm.executeQuery("select * from "+cmbboxTable.getItemAt(cmbBoxIndex));
                 while(rs.next()){
+                    //Für jede Zeile wird eine Array erstellt
                     Object[] arr= new Object[num_cols];
+                    //Array mit Werte für eine Zeile füllen
                     for(int i=0;i<num_cols;i++){
                         arr[i]=rs.getObject(i+1);
                     }
+                    //Die Zeile im Model einfügen
                     tableModel.addRow(arr);
                 }
 
+                // Leere Zeile für Insert
                 tableModel.addRow(new Object[num_cols]);
                 tableResults.setModel(tableModel);
 
+                //ActionListener für Update-Funktioin
                 tableModel.addTableModelListener(new TableModelListener(){
 
                     @Override
                     public void tableChanged(TableModelEvent e) {
+                        //Update Statement
                         tblChanged(e);
                     }
 
                 });
+            //Exception fangen
             } catch (SQLException ex) {
                 Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-    }//GEN-LAST:event_cmbboxTableActionPerformed
-
-    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        int row=tableResults.getSelectedRow();
-        
-        if(row!=tableResults.getModel().getRowCount()-1){
-            int id=Integer.parseInt(tableResults.getModel().getValueAt(row, primPos-1).toString());
-            try {
-                PreparedStatement delete=con.prepareStatement("delete from "+cmbboxTable.getItemAt(cmbBoxIndex)+ " where "+primary_key+"=?");
-
-                delete.setInt(1, id);
-                delete.executeUpdate();
-                tableModel.removeRow(row);
-                
-            } catch (SQLException ex) {
-                Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }//GEN-LAST:event_btnDeleteActionPerformed
-
-    private void btnInsertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertActionPerformed
-        try { 
-            int num_cols=0;
-            int lastRow=tableResults.getModel().getRowCount()-1;
-            ResultSet rs =dmd.getColumns(null, null, cmbboxTable.getItemAt(cmbBoxIndex).toString(), null);
-            String sql="INSERT INTO "+cmbboxTable.getItemAt(cmbBoxIndex)+"(";
-            rs.next();
-            while(rs.next()){
-                sql+=rs.getString(4)+",";
-                num_cols++;
-            }
-            sql = sql.substring(0, sql.length() - 1);
-            sql+=") VALUES (";
-         
-            for(int i=0;i<num_cols;i++){
-                sql+="?,";
-//                sql+=tableResults.getModel().getValueAt(lastRow, i+1)+",";
-            }
-            sql = sql.substring(0, sql.length() - 1);
-            sql+=");";
-            System.out.println(sql);
-            PreparedStatement prepInsert=con.prepareStatement(sql);
-            for(int i=0;i<num_cols;i++){
-                prepInsert.setString(i+1, ""+tableResults.getModel().getValueAt(lastRow, i+1));
-            }
-            
-            prepInsert.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_btnInsertActionPerformed
-    private void fillComboBox(){
-        try {
-            dmd=con.getMetaData();
-            ResultSet r=dmd.getTables(null, null,null,null);
-            while(r.next()){
-                cmbboxTable.addItem(r.getString(3));
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
     }
+    
+    /*
+    Wird gerufen wenn eine Änderund in JTable passiert.
+    Reagiert auf Änderungen im JTable und führt ein UPDATE Statement aus.
+    kein Rückgabewert
+    */
     private void tblChanged(TableModelEvent e){
+        //Geänderte Zeile speichern
         int row=e.getFirstRow();
+        //Spaltenname von geänderte Zeile
         String columnName=tableResults.getModel().getColumnName(e.getColumn());
-        if(row!=tableResults.getModel().getRowCount()-1){
+        
+        if(row!=tableResults.getModel().getRowCount()-1){ //Wenn nicht der letze (sonst insert)
+            //Name des Primary Key speichern
             String id=tableResults.getModel().getValueAt(row, primPos-1).toString();
-            System.out.println(columnName+row+id);
+            //Wert des Primary Key speichern
             String value=tableResults.getModel().getValueAt(row,e.getColumn()).toString();
 
             try {
-                PreparedStatement update=con.prepareStatement("update city set "+columnName+"=? where "+primary_key+"=?");
-
+                //Prepared Statement erstellen : Tabellenname soll nicht als Parameter(?) gegeben werden,
+                // weil es dann mit Anfüfrungszeichen eingefügt wird (SQL Syntax Error)
+                PreparedStatement update=con.prepareStatement("update "+cmbboxTable.getItemAt(cmbBoxIndex).toString()+" set "+columnName+"=? where "+primary_key+"=?");
+                // Parameter binden
                 update.setString(1, value);
                 update.setString(2, ""+id);
-                System.out.println(update.toString());
+
                 update.executeUpdate();
-                
+            
+            //Exception fangen
             } catch (SQLException ex) {
                 Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -443,11 +543,10 @@ public class mainFrame extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         try {
-            /* Set the Nimbus look and feel */
-            
-            //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-            /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-            * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+            /* 
+            Look and Feel ändern
+            Das Programm sieht schöner aus
+            (Nimmt den LookAndFeel vom BetriebSystem)
             */
             
             javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -462,9 +561,7 @@ public class mainFrame extends javax.swing.JFrame {
         }
 
         
-        //</editor-fold>
-
-        /* Create and display the form */
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new mainFrame().setVisible(true);
@@ -495,7 +592,8 @@ public class mainFrame extends javax.swing.JFrame {
     Connection con=null;
     DatabaseMetaData dmd=null;
     OurTableModel tableModel=null;
-    int primPos;
-    String primary_key;
-    int cmbBoxIndex=0;
+    
+    int primPos; //Postion des Primary Keys
+    String primary_key; // Wert des Primary Keys
+    int cmbBoxIndex=0; //Index des Selektiertes Eintritt im ComboBox
 }
