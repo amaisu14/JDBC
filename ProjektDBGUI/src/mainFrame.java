@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.TableModelEvent;
@@ -68,6 +69,7 @@ public class mainFrame extends javax.swing.JFrame {
         lblDatabase = new javax.swing.JLabel();
         cmbboxTable = new javax.swing.JComboBox();
         pass = new javax.swing.JPasswordField();
+        btnDelete = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -145,6 +147,13 @@ public class mainFrame extends javax.swing.JFrame {
             }
         });
 
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -174,7 +183,10 @@ public class mainFrame extends javax.swing.JFrame {
                                 .addComponent(lblTable, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbboxTable, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(cmbboxTable, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(89, 89, 89)
+                                .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -193,9 +205,9 @@ public class mainFrame extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblServer, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtServer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -208,9 +220,9 @@ public class mainFrame extends javax.swing.JFrame {
                             .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblTable, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cmbboxTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(cmbboxTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnDelete)))
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -293,13 +305,14 @@ public class mainFrame extends javax.swing.JFrame {
                 primPos=primaryKey.getInt("KEY_SEQ");
                 primary_key=primaryKey.getString(4);
                 System.out.println(primPos);
-                OurTableModel tableModel=new OurTableModel(primPos-1);
+                tableModel=new OurTableModel(primPos-1);
                 int num_cols=0;
                 while(rs.next()){
                     tableModel.addColumn(rs.getString(4));
                     System.out.println(rs.getString(4));
                     num_cols++;
                 }
+               
                 tableResults.setModel(tableModel);
 
                 Statement stm=con.createStatement();
@@ -328,6 +341,24 @@ public class mainFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_cmbboxTableActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        int row=tableResults.getSelectedRow();
+        
+        if(row!=tableResults.getModel().getRowCount()-1){
+            int id=Integer.parseInt(tableResults.getModel().getValueAt(row, primPos-1).toString());
+            try {
+                PreparedStatement delete=con.prepareStatement("delete from "+cmbboxTable.getItemAt(cmbBoxIndex)+ " where "+primary_key+"=?");
+
+                delete.setInt(1, id);
+                delete.executeUpdate();
+                tableModel.removeRow(row);
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
     private void fillComboBox(){
         try {
             dmd=con.getMetaData();
@@ -343,22 +374,27 @@ public class mainFrame extends javax.swing.JFrame {
     private void tblChanged(TableModelEvent e){
         int row=e.getFirstRow();
         String columnName=tableResults.getModel().getColumnName(e.getColumn());
-        int id=Integer.parseInt(tableResults.getModel().getValueAt(row, primPos-1).toString());
-        System.out.println(columnName+row+id);
-        String value=tableResults.getModel().getValueAt(row,e.getColumn()).toString();
-        
-        try {
-            PreparedStatement update=con.prepareStatement("update city set "+columnName+"=? where "+primary_key+"=?");
+        if(row!=tableResults.getModel().getRowCount()-1){
+            int id=Integer.parseInt(tableResults.getModel().getValueAt(row, primPos-1).toString());
+            System.out.println(columnName+row+id);
+            String value=tableResults.getModel().getValueAt(row,e.getColumn()).toString();
 
-            update.setString(1, value);
-            update.setInt(2, id);
-            System.out.println(update.toString());
-            update.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                PreparedStatement update=con.prepareStatement("update city set "+columnName+"=? where "+primary_key+"=?");
+
+                update.setString(1, value);
+                update.setInt(2, id);
+                System.out.println(update.toString());
+                update.executeUpdate();
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(mainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
     }
+    
+   
     /**
      * @param args the command line arguments
      */
@@ -395,6 +431,7 @@ public class mainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConnect;
+    private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnDisconnect;
     private javax.swing.JComboBox cmbboxTable;
     private javax.swing.JScrollPane jScrollPane1;
@@ -413,6 +450,7 @@ public class mainFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
     Connection con=null;
     DatabaseMetaData dmd=null;
+    OurTableModel tableModel=null;
     int primPos;
     String primary_key;
     int cmbBoxIndex=0;
