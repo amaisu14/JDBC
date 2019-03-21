@@ -330,13 +330,13 @@ public class mainFrame extends javax.swing.JFrame {
         //Wenn es nicht die letzte Zeile ist (sonst Insert)
         if(row!=tableResults.getModel().getRowCount()-1){
             //Wert des Primary Keys speichern (primPos-1 weil Spalten in getValueAt beginnen von 0)
-            int id=Integer.parseInt(tableResults.getModel().getValueAt(row, primPos-1).toString());
+            String id=tableResults.getModel().getValueAt(row, primPos-1).toString();
             try {
                 //Preparet statement erstellen
                 PreparedStatement delete=con.prepareStatement("delete from "+cmbboxTable.getItemAt(cmbBoxIndex)+ " where "+primary_key+"=?");
                 
                 //Parameter binden
-                delete.setInt(1, id);
+                delete.setString(1, id);
                 delete.executeUpdate();
             
 
