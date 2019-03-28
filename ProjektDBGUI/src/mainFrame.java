@@ -453,9 +453,10 @@ public class mainFrame extends javax.swing.JFrame {
                 ResultSet primaryKey=dmd.getPrimaryKeys(null, null, cmbboxTable.getItemAt(cmbBoxIndex).toString());
                 
                 //Meistens gibt es nur eine
-                primaryKey.next();
+                if(primaryKey.next()){
                 primPos=primaryKey.getInt("KEY_SEQ"); //position speichern (welche Spalte)
                 primary_key=primaryKey.getString(4);  //wert speicern
+                }
 
                 //TableModel für den JTable erstellen(Spalte mit Primary Key nicht editierbar)
                 tableModel=new OurTableModel(primPos-1);
